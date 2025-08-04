@@ -247,6 +247,7 @@ bool HDMICEC::send(uint8_t source, uint8_t destination, const std::vector<uint8_
       }
       ESP_LOGV(TAG, "HDMICEC::send(): bus available, sending frame...");
 
+      App.feed_wdt()
       auto result = send_frame_(frame, is_broadcast);
       if (result == SendResult::Success) {
         ESP_LOGD(TAG, "frame sent and acknowledged");
