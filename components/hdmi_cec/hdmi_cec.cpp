@@ -221,7 +221,10 @@ void HDMICEC::try_builtin_handler_(uint8_t source, uint8_t destination, const st
 }
 
 bool HDMICEC::send(uint8_t source, uint8_t destination, const std::vector<uint8_t> &data_bytes) {
-  if (monitor_mode_) return false;
+  if (monitor_mode_) {
+    ESP_LOGE(TAG, "Attempted to send packet while device is in monitor mode");
+    return false;
+  }
 
   bool is_broadcast = (destination == 0xF);
 
