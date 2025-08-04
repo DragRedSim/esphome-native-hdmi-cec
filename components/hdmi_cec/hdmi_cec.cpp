@@ -27,7 +27,7 @@ static const gpio::Flags OUTPUT_MODE_FLAGS = gpio::FLAG_OUTPUT | gpio::FLAG_OPEN
 // Note: the esp8266 does NOT support 'FLAG_OUTPUT | FLAG_OPEN_DRAIN | FLAG_PULLUP' as opposed to the esp32 and rp2040.
 // (see 'flags_to_mode' in its esphome gpio.cpp).
 // So, unfortunately, in 'OPEN_DRAIN' mode, the required 'PULLUP' cannot be activated.
-// Therefor, 'OUTPUT' will be used only to write '0': For writing a '1' the mode is switched to 'INPUT | PULLUP'.
+// Therefore, 'OUTPUT' will be used only to write '0': For writing a '1' the mode is switched to 'INPUT | PULLUP'.
 // That allows to safely check for cec bus conflicts on writing '1' (avoid short-circuit with other bus initiators).
 
 Frame::Frame(uint8_t initiator_addr, uint8_t target_addr, const std::vector<uint8_t> &payload)
@@ -252,7 +252,7 @@ bool HDMICEC::send(uint8_t source, uint8_t destination, const std::vector<uint8_
       }
       ESP_LOGV(TAG, "HDMICEC::send(): bus available, sending frame...");
 
-      App.feed_wdt()
+      App.feed_wdt();
       auto result = send_frame_(frame, is_broadcast);
       if (result == SendResult::Success) {
         ESP_LOGD(TAG, "frame sent and acknowledged");
