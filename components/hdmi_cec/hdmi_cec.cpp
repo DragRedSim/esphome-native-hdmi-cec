@@ -1,6 +1,8 @@
 #include "hdmi_cec.h"
 #include "esphome/core/log.h"
 
+#include "esphome/core/application.h" //required to be able to feed the watchdog
+
 #ifdef USE_CEC_DECODER
 #include "cec_decoder.h"
 #endif
