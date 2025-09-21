@@ -78,6 +78,7 @@ void HDMICEC::dump_config() {
   ESP_LOGCONFIG(TAG, "  address: %x", address_);
   ESP_LOGCONFIG(TAG, "  promiscuous mode: %s", (promiscuous_mode_ ? "yes" : "no"));
   ESP_LOGCONFIG(TAG, "  monitor mode: %s", (monitor_mode_ ? "yes" : "no"));
+  ESP_LOGCONFIG(TAG, "  native handlers: %s", (native_handlers_ ? "yes" : "no"));
 }
 
 void HDMICEC::loop() {
@@ -126,7 +127,7 @@ void HDMICEC::loop() {
 
     // If nothing in on_message handled this message, we try to run the built-in handlers
     bool is_directly_addressed = (dest_addr != 0xF && dest_addr == address_);
-    if (is_directly_addressed && !handled_by_trigger) {
+    if (is_directly_addressed && (!handled_by_trigger || native_handlers_)) {
       try_builtin_handler_(src_addr, dest_addr, data);
     }
   }

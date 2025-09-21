@@ -72,10 +72,10 @@ hdmi_cec:
   # DDC support is not yet implemented, so you'll have to set this manually.
   physical_address: 0x4000 # Required
   
-  # The name that will we displayed in the list of devices on your TV/receiver
+  # The name that will be displayed in the list of devices on your TV/receiver
   osd_name: "my device" # Optional. Defaults to "esphome"
   
-  # By default, promiscuous mode is disabled, so the component only handles directly-address messages (matching
+  # By default, promiscuous mode is disabled, so the component only handles directly-addressed messages (matching
   # the address configured above) and broadcast messages. Enabling promiscuous mode will make the component
   # listen for all messages (both in logs and the on_message triggers)
   promiscuous_mode: false # Optional. Defaults to false
@@ -83,6 +83,15 @@ hdmi_cec:
   # By default, monitor mode is disabled, so the component can send messages and acknowledge incoming messages.
   # Enabling monitor mode lets the component act as a passive listener, disabling active manipulation of the CEC bus.
   monitor_mode: false # Optional. Defaults to false
+
+  # By default, the default handlers are overridden when a matching handler is found in the on_message triggers.
+  # This becomes an issue when logging all traffic, as the logging handler will disable the default trigger,
+  # leading to the device not responding to messages addressed to it.
+  # This will only become an issue if the device is expected to actively participate on the CEC bus.
+  # Note that this will only activate the inbuilt CEC responses on the bus to the following commands:
+  # <Get CEC Version>, <Give Device Power Status>, <Give OSD Name>, <Give Physical Address>
+  # and will activate these responses even if a specific trigger handling these commands is also present.
+  native_handlers: false # Optional. Defaults to false
 
 ```
 
@@ -127,6 +136,14 @@ You can filter by:
 
 If no filter is set, you will catch all messages.
 
+If you wish to enable the default handlers, as well as any on_message handlers you have defined in the YAML, set the following value:
+```yaml
+hdmi_cec:
+  ...
+  native_handlers: True
+
+```
+
 ---
 
 ### 🔘 2. Add Template Buttons to Send CEC Commands
@@ -143,7 +160,7 @@ button:
         data: [0x36]
 ```
 
-> More button examples in the advanced EHPHome configuration example below.
+> More button examples in the advanced ESPHome configuration example below.
 
 ---
 
@@ -169,7 +186,7 @@ api:
 
 ---
 
-### ☁️ 4. Publish CEC Messages over MQTT ([CEC-O-MATIC](https://www.cec-o-matic.com/) format)
+### ☁️ 4. Publish CEC Messages over MQTT ([CEC-O-MATIC](https://www.cec-o-matic.com/) format) to a custom topic
 
 Under `mqtt:` and `hdmi_cec:`:
 
@@ -297,7 +314,7 @@ hdmi_cec:
   # DDC support is not yet implemented, so you'll have to set this manually.
   physical_address: 0x4200 # Required
   
-  # The name that will we displayed in the list of devices on your TV/receiver
+  # The name that will be displayed in the list of devices on your TV/receiver
   osd_name: "HDMI Bridge" # Optional. Defaults to "esphome"
   
   # By default, promiscuous mode is disabled, so the component only handles directly-address messages (matching
@@ -309,8 +326,16 @@ hdmi_cec:
   # Enabling monitor mode lets the component act as a passive listener, disabling active manipulation of the CEC bus.
   monitor_mode: false # Optional. Defaults to false
 
-  on_message:
+  # By default, the default handlers are overridden when a matching handler is found in the on_message triggers.
+  # This becomes an issue when logging all traffic, as the logging handler will disable the default trigger,
+  # leading to the device not responding to messages addressed to it.
+  # This will only become an issue if the device is expected to actively participate on the CEC bus.
+  # Note that this will only activate the inbuilt CEC responses on the bus to the following commands:
+  # <Get CEC Version>, <Give Device Power Status>, <Give OSD Name>, <Give Physical Address>
+  # and will activate these responses even if a specific trigger handling these commands is also present.
+  native_handlers: true # Optional. Defaults to false
 
+  on_message:
     - then:
         #Send CEC messages via MQTT in CEC-O-Matic format
         mqtt.publish:
@@ -325,7 +350,7 @@ hdmi_cec:
             id(cec_raw_message).publish_state(frame.to_string(true));
             id(cec_translated_message).publish_state(frame.to_string());
 
-text_sensor: #Consider excluding these sensors from you Home Assistant database to save space.
+text_sensor: #Consider excluding these sensors from your Home Assistant database to save space.
   - platform: template
     name: "HDMI CEC Raw Message"
     id: cec_raw_message #Do not delete if used with CEC message decoder
